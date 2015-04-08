@@ -1,0 +1,35 @@
+channel a, b, c, d, f
+
+P = a->b->c->SKIP
+Q = a->((c->d->SKIP)[] (b->f->SKIP))
+
+S1 = P;Q
+S2 = P [|{a , b}|] Q
+S3 = P ||| Q
+S4 = P [] Q
+S5 = P /\ Q
+
+assert S1 [T= S2
+assert S1 [T= S3
+assert S1 [T= S4
+assert S1 [T= S5
+
+assert S2 [T= S1
+assert S2 [T= S3
+assert S2 [T= S4
+assert S2 [T= S5
+
+assert S3 [T= S1 -- refinement
+assert S3 [T= S2
+assert S3 [T= S4
+assert S3 [T= S5
+
+assert S4 [T= S1 
+assert S4 [T= S2
+assert S4 [T= S3
+assert S4 [T= S5
+
+assert S5 [T= S1 -- refinement
+assert S5 [T= S2
+assert S5 [T= S3
+assert S5 [T= S4 -- refinement
