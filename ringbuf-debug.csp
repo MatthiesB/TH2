@@ -49,10 +49,10 @@ B(s) = (#s > 0)&rd!head(s) -> B(tail(s))
 -- Abstrakte Spezifikation des Readers
 -----------------------------------------------------------------
 
-channel process_rd  -- abstraktes Ereignis: verarbeite die gelesenen Daten
+-- channel process_rd  -- abstraktes Ereignis: verarbeite die gelesenen Daten -- useLess
 
 
-READ_ABS = rd?x -> process_rd -> READ_ABS
+READ_ABS = rd?x -> READ_ABS     -- was READ_ABS = rd?x -> process_rd -> READ_ABS. found via debug. process_id is useless
 
 
 
@@ -74,10 +74,11 @@ WRABS(x)  = wr!x -> WRITE_ABS
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 
-SYS_CON = (READ_INDEX(0) ||| WRITE_INDEX(0))    -- was: SYS_CON = (READ_INDEX ||| WRITE_INDEX). found via syntax check. missing parameter.
-	  [|{| rd_ri, rd_wi |}|]
-	  (WRITE_CON ||| READ_CON)
-
+SYS_CON = ((READ_INDEX(0) ||| WRITE_INDEX(0))    -- was: SYS_CON = (READ_INDEX ||| WRITE_INDEX). found via syntax check. missing parameter.
+	  [|{| rd_ri, rd_wi, wr_ri, wr_wi |}|]		 -- was: [|{| rd_ri, rd_wi |}|]. found via debug. missing 2 channels
+	  (WRITE_CON ||| READ_CON))
+		[|{| crd, cwr |}|]						 -- added CBUF
+		CBUF
 
 -----------------------------------------------------------------
 -- Aufbau des Ringpuffers
@@ -95,9 +96,9 @@ channel rd_ri : { 0..max } -- Kanal zum Lesen des Read-Index
 channel wr_ri : { 0..max } -- Kanal zum Schreiben auf den Read-Index
 
 READ_INDEX(i) = 
-	      rd_ri!i -> WRITE_INDEX(i)
+	      rd_ri!i -> READ_INDEX(i) 	-- was: rd_ri!i -> WRITE_INDEX(i). found via review. calls write_index instead of read_index.
 	      []
-	      wr_ri?x -> READ_INDEX(i)
+	      wr_ri?x -> READ_INDEX(x)      -- was wr_ri?x -> READ_INDEX(i). found via review. reads value from channel but doesn't save it.
 
 --
 -- Write-Index
@@ -143,7 +144,7 @@ CB(i,x) = crd.i!x -> CB(i,x)
 
 READ_CON = 
 	 rd_ri?x -> rd_wi?y ->           -- was: rd_ri?x -> rd_wi?y; found via syntax check. illegal process definition.
-	 if (x !=y)
+	 if (x == y)						 -- was if (x !=y). found via debug. should do nothing (self call) if they are equal.
 	 then READ_CON
 	 else
 	 crd.x?z -> wr_ri!((x+1)%(max+1)) -> READ_CON
@@ -165,7 +166,7 @@ WRITE_CON =  [] d: DATA @ WR_CON(d)
 
 WR_CON(d) = 
 	 rd_ri?x -> rd_wi?y ->
-	 let wi = y%(max+1)
+	 let wi = (y+1)%(max+1)			-- was: let wi = y%(max+1). found via debug. readindex must be compared to wi+1, therefore the formula must be y+1%(max+1)
 	 within
 		if (x == wi) 			-- was: if (x = wi) found via syntax check. wrong comparison operator
 	 	then WRITE_CON
