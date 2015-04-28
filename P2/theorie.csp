@@ -1,0 +1,6 @@
+channel a,b,c
+
+P = (a -> b -> SKIP)
+Q = (a -> b -> SKIP) |~| (a -> c -> SKIP)
+
+SYS = P [|{|a,b|}|] Q
