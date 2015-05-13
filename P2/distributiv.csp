@@ -1,7 +1,7 @@
 channel a,b,c
 
-Q = ((a -> b -> STOP) [] (a -> c -> SKIP)) 
-P = a -> ((b -> STOP) [] (c -> SKIP)) 
+Q = ((a -> b -> STOP) [] (a -> c -> SKIP))
+P = a -> ((b -> STOP) [] (c -> SKIP))
 
 assert Q [F= P
 assert Q [T= P
@@ -11,9 +11,13 @@ assert P [F= Q
 assert P [T= Q
 assert P [FD= Q
 
--- P ist ein Refinement von Q fuer alle Modelle. Q ist hingegen kein Refinement von P, da zwar die Traces identisch sind ([T= gilt in beide Richtungen),
--- aber nicht die Knoten, an an denen die Entscheidung ueber die weiter akzeptierten Ereignisse getroffen wird (P [F= Q gilt nicht). Das heisst, dass durch 
--- Verwendung des external choice Operators im Fall Q bei Eintreffen des erstens Eignisses der Pfad festgelegt wird und nicht mehr änderbar ist. Wenn das zweite 
--- Ereignis dann nicht dem erwarteten Ereignis in dem Pfad entspricht, entsteht eine Blockade. Bei P hingegen koennen nach verarbeiten des ersten Ereignisses 
+-- P ist ein Refinement von Q fuer alle Modelle. Q ist hingegen kein Refinement
+-- von P, da zwar die Traces identisch sind ([T= gilt in beide Richtungen),
+-- aber nicht die Knoten, an an denen die Entscheidung ueber die weiter akzeptierten
+-- Ereignisse getroffen wird (P [F= Q gilt nicht). Das heisst, dass durch
+-- Verwendung des external choice Operators im Fall Q bei Eintreffen des erstens
+-- Eignisses der Pfad festgelegt wird und nicht mehr änderbar ist. Wenn das zweite
+-- Ereignis dann nicht dem erwarteten Ereignis in dem Pfad entspricht, entsteht
+-- eine Blockade. Bei P hingegen koennen nach verarbeiten des ersten Ereignisses
 -- noch beide Pfade weiter verfolgt werden.
 -- Da [FD= [F= enthaelt, ist Q ebenfalls kein Failures Divergences-refinement von P.
