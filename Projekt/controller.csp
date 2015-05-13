@@ -1,0 +1,8 @@
+max = 10
+
+
+
+CONTROLLER(x) = (x > max) CONTROLLER(0)
+       []
+       --DO LOTTES MAGIC!!!!-- -> CONTROLLER(x+1)
+
