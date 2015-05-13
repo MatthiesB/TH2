@@ -2,21 +2,18 @@
 --- authors: Vitalij Kagadij, Lotte Steenbrink, Jan Strothmann, Matthies Becker
 
 max = 2
-
 datatype SIGNAL = SMOKE | NO_SMOKE | POLL | RESET
-
-channel tx : {0..max}.SIGNAL
-channel rx : {0..max}.SIGNAL
+channel comm : {0..max}.SIGNAL
 
 CONTROLLER(x) = (x > max)& CONTROLLER(0)
        []
-       (x <= max)&tx!x.POLL -> ((rx?x.NO_SMOKE -> CONTROLLER(x+1)) [] (rx?x.SMOKE -> ALERT(x)))
+       (x <= max)&comm!x.POLL -> ((comm?x.NO_SMOKE -> CONTROLLER(x+1)) [] (comm?x.SMOKE -> ALERT(x)))
 
 	  
-ALERT(x) = tx!x.RESET -> CONTROLLER(x+1)
+ALERT(x) = comm!x.RESET -> CONTROLLER(x+1)
 	  
-SENSOR(x) = (tx?x.POLL -> ((rx!x.NO_SMOKE -> SENSOR(x)) |~| (rx!x.SMOKE -> SENSOR(x))))
+SENSOR(x) = (comm?x.POLL -> ((comm!x.NO_SMOKE -> SENSOR(x)) |~| (comm!x.SMOKE -> SENSOR(x))))
             [] 
-			(tx?x.RESET -> SENSOR(x)) -- todo
+			(comm?x.RESET -> SENSOR(x)) -- todo
 	   
-SYS = CONTROLLER(0) [|{| tx, rx |}|] SENSOR(0)
+SYS = CONTROLLER(0) [|{| comm |}|] SENSOR(0)
