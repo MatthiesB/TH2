@@ -11,4 +11,7 @@ assert P [F= Q
 assert P [T= Q
 assert P [FD= Q
 
--- In diesem Beispiel 
+-- In diesem Beispiel treten durch die Verwendung des internal choice Operators
+-- tau-Uebergaenge auf, die dem Prozess erlauben, den richtigen Pfad auszuwählen. 
+-- So koennen keine Blockaden entstehen, daher gelten in diesem Beispiel alle 
+-- refinements.
