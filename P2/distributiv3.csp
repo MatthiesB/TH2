@@ -10,3 +10,9 @@ assert Q [FD= P
 assert P [F= Q
 assert P [T= Q
 assert P [FD= Q
+
+-- [T= gilt in beide Richtungen, da beide Prozesse jeweils auf dem andern Prozess 
+-- abegebildet werden können. 
+-- [F= gilt, da es keine Deadlocks gibt, da jede Ereignisfolge nur aus einem Ereignis 
+-- und Tick besteht. 
+-- [FD= gilt, da ohne Schleifen kein Livelock entstehen kann.
