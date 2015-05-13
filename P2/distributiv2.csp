@@ -10,3 +10,5 @@ assert Q [FD= P
 assert P [F= Q
 assert P [T= Q
 assert P [FD= Q
+
+In diesem Beispiel 

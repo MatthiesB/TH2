@@ -10,3 +10,7 @@ assert Q [FD= P
 assert P [F= Q
 assert P [T= Q
 assert P [FD= Q
+
+-- P ist ein Refinement von Q für alle Modelle. Q ist hingegen kein Refinement von P, da zwar die Traces identisch sind ([T= gilt in beide Richtungen),
+-- aber nicht die Knoten, an an denen die Entscheidung über die weiter akzeptierten Ereignisse getroffen wird (P [F= Q gilt nicht).
+-- Da [FD= [F= enthält, ist Q ebenfalls kein Failures Divergences-refinement von P.
