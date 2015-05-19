@@ -1,19 +1,50 @@
---- smoke detector P.A.T.R.I.C.K. STAR  v0.1 ---
---- authors: Vitalij Kagadij, Lotte Steenbrink, Jan Strothmann, Matthies Becker
+---------------------------------------------------------------------------------------
+---   smoke detector P.A.T.R.I.C.K. STAR  v0.2                                      ---
+---   authors: Vitalij Kagadij, Lotte Steenbrink, Jan Strothmann, Matthies Becker   ---
+---------------------------------------------------------------------------------------
 
 max = 2
 datatype SIGNAL = SMOKE | NO_SMOKE | POLL | RESET
 channel comm : {0..max}.SIGNAL
+channel alert
 
 CONTROLLER(x) = (x > max)& CONTROLLER(0)
        []
        (x <= max)&comm!x.POLL -> ((comm?x.NO_SMOKE -> CONTROLLER(x+1)) [] (comm?x.SMOKE -> ALERT(x)))
 
 	  
-ALERT(x) = comm!x.RESET -> CONTROLLER(x+1)
+ALERT(x) = alert -> comm!x.RESET -> CONTROLLER(x+1)
 	  
-SENSOR(x) = (comm?x.POLL -> ((comm!x.NO_SMOKE -> SENSOR(x)) |~| (comm!x.SMOKE -> SENSOR(x))))
+SENSOR(x) = (comm.x?POLL -> ((comm!x.NO_SMOKE -> SENSOR(x)) |~| (comm!x.SMOKE -> SENSOR(x))))
             [] 
-			(comm?x.RESET -> SENSOR(x)) -- todo
+			(comm.x?RESET -> SENSOR(x)) -- todo
 	   
-SYS = CONTROLLER(0) [|{| comm |}|] SENSOR(0)
+--- concrete system --- 
+SYS = CONTROLLER(0) [|{| comm |}|] (||| i:{ 0..max } @ SENSOR(i))
+
+-------------
+--- Tests --- 
+-------------
+
+--- channels for tests only --- 
+channel poll, no_smoke, error
+
+SYS_HIDDEN = 
+   SYS[[ comm.x.POLL <- poll, comm.x.NO_SMOKE <- no_smoke | x <- {0..max} ]] 
+
+--- test specification ---
+SPEC = comm?x.SMOKE -> alert -> comm.x?RESET -> SPEC
+
+SPEC2 = comm?x.SMOKE -> alert -> comm?y.RESET -> if (y != x) then error -> STOP else SPEC2
+
+--- tests if the specified behaviour is possible in concrete system ---
+assert SYS_HIDDEN\{| poll, no_smoke |} [T= SPEC
+
+--- tests if the specified behaviour is possible in concrete system ---
+assert not SYS_HIDDEN\{| poll, no_smoke |} [T= SPEC2
+
+--- tests if the specified behaviour is possible in concrete system and does not result in dead locks ---
+assert SYS_HIDDEN\{| poll, no_smoke |} [F= SPEC
+
+--- tests if the specified behaviour is possible in concrete system and results in live locks (necessary for a infinite system!) ---
+assert SYS_HIDDEN\{| poll, no_smoke |} [FD= SPEC
