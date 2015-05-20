@@ -40,11 +40,9 @@ SPEC2 = comm?x.SMOKE -> alert -> comm?y.RESET -> if (y != x) then error -> STOP 
 --- tests if the specified behaviour is possible in concrete system ---
 assert SYS_HIDDEN\{| poll, no_smoke |} [T= SPEC
 
---- tests if the specified behaviour is possible in concrete system ---
+--- tests if the system resets the sensor that caused the alarm ---
 assert not SYS_HIDDEN\{| poll, no_smoke |} [T= SPEC2
 
---- tests if the specified behaviour is possible in concrete system and does not result in dead locks ---
 assert SYS_HIDDEN\{| poll, no_smoke |} [F= SPEC
 
---- tests if the specified behaviour is possible in concrete system and results in live locks (necessary for a infinite system!) ---
 assert SYS_HIDDEN\{| poll, no_smoke |} [FD= SPEC
