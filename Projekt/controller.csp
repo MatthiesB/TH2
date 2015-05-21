@@ -27,22 +27,39 @@ SYS = CONTROLLER(0) [|{| comm |}|] (||| i:{ 0..max } @ SENSOR(i))
 -------------
 
 --- channels for tests only --- 
-channel poll, no_smoke, error
+channel poll, no_smoke, error, smoke
 
 SYS_HIDDEN = 
    SYS[[ comm.x.POLL <- poll, comm.x.NO_SMOKE <- no_smoke | x <- {0..max} ]] 
 
+SYS_HIDDEN2 = 
+   SYS[[ comm.x.POLL <- poll, comm.x.SMOKE <- smoke | x <- {0..max} ]] 
+   
+   
 --- test specification ---
 SPEC = comm?x.SMOKE -> alert -> comm.x?RESET -> SPEC
-
-SPEC2 = comm?x.SMOKE -> alert -> comm?y.RESET -> if (y != x) then error -> STOP else SPEC2
 
 --- tests if the specified behaviour is possible in concrete system ---
 assert SYS_HIDDEN\{| poll, no_smoke |} [T= SPEC
 
---- tests if the system resets the sensor that caused the alarm ---
-assert not SYS_HIDDEN\{| poll, no_smoke |} [T= SPEC2
-
 assert SYS_HIDDEN\{| poll, no_smoke |} [F= SPEC
 
 assert SYS_HIDDEN\{| poll, no_smoke |} [FD= SPEC
+
+
+
+SPEC2 = comm?x.SMOKE -> alert -> comm?y.RESET -> if (y != x) then error -> STOP else SPEC2
+
+--- tests if the system resets the sensor that caused the alarm ---
+assert not SYS_HIDDEN\{| poll, no_smoke |} [F= SPEC2
+
+
+
+SPEC3 = no_smoke -> SPEC3 -- useful?
+
+--- tests if the specified behaviour is possible in concrete system ---
+assert SYS_HIDDEN\{| poll |} [T= SPEC3
+
+assert SYS_HIDDEN\{| poll |} [F= SPEC3
+
+assert SYS_HIDDEN\{| poll |} [FD= SPEC3
