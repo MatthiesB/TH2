@@ -63,4 +63,16 @@
 \end{align*}
 Somit wurde durch Umformen bewiesen, dass $Stop \bigtriangleup P =_T P$.
 
+  \subsection*{b)}
+Durch Einsetzen erhalten wir:\\
+$\{tr | tr \in (traces(P)\cup traces(Q)) \wedge \checkmark \not\in \sigma(tr)\} \cup \{tr_1 \frown tr_2 | tr_1 \frown \checkmark \in (traces(P) \cup traces(Q))\wedge tr_2 \in traces(R) \} =
+(\{tr | tr \in traces(P) \wedge \checkmark \not\in \sigma (tr)\} \cup \{tr_1 \frown tr_2 | tr_1 \frown \checkmark \in traces (P) \wedge tr_1 \in traces(R)\}) \cup (\{tr | tr \in traces(Q) \wedge \checkmark \in \sigma(tr)\} \cup \{tr_1 \frown tr_2 | tr_1 \frown \checkmark \in traces(Q) \wedge tr_1 \in traces(R)\})
+$\\
+Formen nun die linke Seite um, bis wir die rechte Seite bekommen.\\
+$\{tr|tr \in traces(P) \wedge \checkmark \not\in \sigma(tr)\} \cup \{tr | tr \in traces(Q) \wedge \checkmark \not\in \sigma(tr)\} \cup \{tr_1 \frown tr_2 | tr_1 \frown \checkmark \in (traces(P) \cup(traces(Q)) \wedge tr_2 \in traces(R)\}
+$\\
+$= \{tr|tr \in traces(P) \wedge \checkmark \not\in \sigma(tr)\} \cup \{tr| tr \in traces(Q) \wedge \checkmark \not\in \sigma(tr)\} \cup \{tr_1 \frown tr_2 | tr_1 \frown \checkmark \in traces(P) \wedge tr_2 \in traces(R)\} \cup \{tr_1 \frown tr_2 | r_1 \frown \checkmark \in traces(Q) \wedge tr_2 \in traces(R)\}$
+Dies lässt sich nun noch umsortieren, um den oberen rechten Term zu erhalten:\\
+$= (\{tr | tr \in traces(P) \wedge \checkmark \not\in \sigma (tr)\} \cup \{tr_1 \frown tr_2 | tr_1 \frown \checkmark \in traces (P) \wedge tr_1 \in traces(R)\}) \cup (\{tr | tr \in traces(Q) \wedge \checkmark \in \sigma(tr)\} \cup \{tr_1 \frown tr_2 | tr_1 \frown \checkmark \in traces(Q) \wedge tr_1 \in traces(R)\})$
+Somit wurde durch Umformen bewiesen, dass die Behauptung gilt.
 \end{document}
