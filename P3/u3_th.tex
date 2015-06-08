@@ -10,6 +10,8 @@
 \usepackage{listings}
 \usepackage{amsmath}
 \usepackage{tikz}
+\usepackage{enumitem}
+
 \def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
 
 \lstset{
@@ -46,10 +48,59 @@
   \rhead{\emph{}\\ \today}
   \lhead{{\Large TH2 "Ubungszettel 4}\\ Bearbeitet von
   Jan Strothmann, Matthies Becker, \\Vitalij Kagadij \& Lotte Steenbrink}
-  \section*{Aufgabe 1}
+
+  \section*{Projekt: Modellierung von Fehlern}
+  \subsection*{a)}
+  Mögliche Fehler:
+  \begin{enumerate}[label=\arabic*.]
+    \item Sensor sendet falsche Sensordaten (Fehlalarm, kein Alarm)
+    \item Sensor reagiert nicht auf Poll (Totalausfall, Kabeldefekt)
+    \item Sensor meldet Defekt
+    \item Sensor lässt sich nicht resetten
+    \item Controller fällt aus
+    \item Controller wertet Daten falsch aus
+  \end{enumerate}
+
+  \subsection*{b)}
+  Modellierte Fehler:
+  \begin{enumerate}[label=\arabic*.]
+    \item Da wir keine modllierte Umwelt haben, können wir ziwschen echtem und falschem Alarm nicht unterscheiden.
+    \item Ohne Zeitmodellierung nicht modellierbar (Deadlock)
+    \item Siehe Code
+    \item Siehe Code
+    \item Ohne Zeitmodellierung nicht modellierbar (Deadlock)
+    \item Nicht modellierbar bzw nicht sinnvoll
+  \end{enumerate}
+
+  \subsection*{c)}
+  Was können wir erkennen?
+  \begin{enumerate}[label=\arabic*.]
+    \item Nur mit Redundanzsensor
+    \item Nur mit Zeitmodellierung
+    \item Siehe Code
+    \item Nur mit reset ACK und Zeitmodellierung
+    \item Nur mit zeit UND watchdog-prozess ODER erkennung in den sensoren: zb: melder leuchten rot wenn controller nicht zurück ACKt
+    \item Nicht zur Laufzeit feststellbar
+  \end{enumerate}
+
+  \section*{Projekt: Fehlertoleranz}
+  \subsection*{a)}
+    Siehe 1. c)
+
+  \subsection*{b)}
+  \begin{enumerate}[label=\arabic*.]
+    \item Redundanz im Sensor: extra internal choice
+    \item Mit timeout, bei timeout Service-Warnung
+    \item Nachricht auf dem Kommunikationskanal -> Service-Warnung
+    \item Mit Ack/timeout, bei timeout Service-Warnung
+    \item timeout \& watchdog oder Erkennung durch Sensoren, bei Fehler Service-Warnung
+    \item Gar nicht
+  \end{enumerate}
+
+  \section*{Theorie: Aufgabe 1}
   Siehe CSP-Datei.
 
-  \section*{Aufgabe 2}
+  \section*{Theorie: Aufgabe 2}
   \subsection*{a)}
   Wissen laut traces-Definition für den Interupt:\\
   $traces(Stop \bigtriangleup P) = traces(Stop) \cup \{tr_1 \frown tr_2 | tr_1 \in traces(Stop) \wedge \checkmark \not\in \sigma(tr_1) \wedge tr_2 \in traces(P) \}$
