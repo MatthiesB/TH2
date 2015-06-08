@@ -46,59 +46,18 @@
 
   % Document header. (See docs/latex/templates/header.tex)
   \rhead{\emph{}\\ \today}
-  \lhead{{\Large TH2 "Ubungszettel 4}\\ Bearbeitet von
+  \lhead{{\Large TH2 Theorie 3}\\ Bearbeitet von
   Jan Strothmann, Matthies Becker, \\Vitalij Kagadij \& Lotte Steenbrink}
 
-  \section*{Projekt: Modellierung von Fehlern}
-  \subsection*{a)}
-  Mögliche Fehler:
-  \begin{enumerate}[label=\arabic*.]
-    \item Sensor sendet falsche Sensordaten (Fehlalarm, kein Alarm)
-    \item Sensor reagiert nicht auf Poll (Totalausfall, Kabeldefekt)
-    \item Sensor meldet Defekt
-    \item Sensor lässt sich nicht resetten
-    \item Controller fällt aus
-    \item Controller wertet Daten falsch aus
-  \end{enumerate}
 
-  \subsection*{b)}
-  Modellierte Fehler:
-  \begin{enumerate}[label=\arabic*.]
-    \item Da wir keine modllierte Umwelt haben, können wir ziwschen echtem und falschem Alarm nicht unterscheiden.
-    \item Ohne Zeitmodellierung nicht modellierbar (Deadlock)
-    \item Siehe Code
-    \item Siehe Code
-    \item Ohne Zeitmodellierung nicht modellierbar (Deadlock)
-    \item Nicht modellierbar bzw nicht sinnvoll
-  \end{enumerate}
+\section*{Theorie: Aufgabe 1}
+\subsection*{a)}
+P: \{<>, <a>, <b>, <b,\checkmark>, <a,b,\checkmark>\} \\
+Q: \{<>, <a>, <b>, <b,\checkmark>, <a,b,\checkmark>, <b,b,\checkmark>\}
 
-  \subsection*{c)}
-  Was können wir erkennen?
-  \begin{enumerate}[label=\arabic*.]
-    \item Nur mit Redundanzsensor
-    \item Nur mit Zeitmodellierung
-    \item Siehe Code
-    \item Nur mit reset ACK und Zeitmodellierung
-    \item Nur mit zeit UND watchdog-prozess ODER erkennung in den sensoren: zb: melder leuchten rot wenn controller nicht zurück ACKt
-    \item Nicht zur Laufzeit feststellbar
-  \end{enumerate}
+\subsection*{a)}
 
-  \section*{Projekt: Fehlertoleranz}
-  \subsection*{a)}
-    Siehe 1. c)
-
-  \subsection*{b)}
-  \begin{enumerate}[label=\arabic*.]
-    \item Redundanz im Sensor: extra internal choice
-    \item Mit timeout, bei timeout Service-Warnung
-    \item Nachricht auf dem Kommunikationskanal -> Service-Warnung
-    \item Mit Ack/timeout, bei timeout Service-Warnung
-    \item timeout \& watchdog oder Erkennung durch Sensoren, bei Fehler Service-Warnung
-    \item Gar nicht
-  \end{enumerate}
-
-  \section*{Theorie: Aufgabe 1}
-  Siehe CSP-Datei.
+Q ist ein Refinement von P, da $P \subset Q$.
 
   \section*{Theorie: Aufgabe 2}
   \subsection*{a)}
