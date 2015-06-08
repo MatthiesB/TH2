@@ -15,11 +15,11 @@ CONTROLLER(x) = (x > max)& CONTROLLER(0)
 	  
 ALERT(x) = alert -> comm!x.RESET -> CONTROLLER(x+1)
 	  
-SENSOR(x, STATE) = (comm.x?POLL -> if (STATE == NO_SMOKE) 
+SENSOR(x, STATE) = (comm.x?POLL -> if (STATE == NO_SMOKE) -- on poll: determine state, return it to controller and persist it via recursion 
                                    then ((comm!x.NO_SMOKE -> SENSOR(x, NO_SMOKE)) |~| (comm!x.SMOKE -> SENSOR(x, SMOKE)) |~| (comm!x.DEFECT -> SENSOR(x, DEFECT)))
                                    else comm!x.STATE -> SENSOR(x, STATE))
                    [] 
-			       (comm.x?RESET -> if (STATE == SMOKE) then SENSOR(x, NO_SMOKE) 
+			       (comm.x?RESET -> if (STATE == SMOKE) then SENSOR(x, NO_SMOKE) |~| SENSOR(x, SMOKE) -- internal choice for error on reset
 				                    else SENSOR(x, STATE))
 	   
 --- concrete system --- 
