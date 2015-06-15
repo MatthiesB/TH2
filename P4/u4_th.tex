@@ -1,0 +1,100 @@
+\documentclass[10pt,a4paper,fleqn]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[left=3.5cm,right=3cm,top=3cm,bottom=3cm]{geometry}
+\usepackage{fancyhdr}
+\usepackage[ngerman]{babel}
+\usepackage{amsfonts,amsmath}
+\usepackage{cmbright}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{enumitem}
+
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
+
+\lstset{
+    language=Java,
+    basicstyle=\ttfamily\small,
+    numbers=left,
+    numberstyle=\tiny,
+    numbersep=5pt,
+    tabsize=2,
+    showstringspaces=false,
+    extendedchars=true,
+    breaklines=true,
+    showtabs=false,
+    showspaces=false,
+    keywordstyle=\color{green},
+    commentstyle=\color{grey},
+    stringstyle=\color{Blue},
+    mathescape,
+    escapechar=@,
+    morekeywords={bool}
+}
+
+\begin{document}
+
+  % Set defaults. (See docs/latex/templates/settings.tex)
+  \renewcommand{\labelenumi}{(\alph{enumi})}
+  \renewcommand\headrule{\vspace{+2pt}\hrule}
+  \newcommand{\solved}{\[\hfill\Box\]}
+  \setlength{\headheight}{2.5\baselineskip}
+  \pagestyle{fancyplain}
+  \pagenumbering{Roman}
+
+  % Document header. (See docs/latex/templates/header.tex)
+  \rhead{\emph{}\\ \today}
+  \lhead{{\Large TH2 Theorie 4}\\ Bearbeitet von
+  Jan Strothmann, Matthies Becker, \\Vitalij Kagadij \& Lotte Steenbrink}
+
+\section{CSP Semantik}
+\subsection{Unterschied}
+
+\begin{equation*}
+\begin{split}
+failures(P1) = \{&(<>,\{\}),\\
+                 &(<a>, \{a\}),\\
+                 &(<a,b>, \{a,b,c, \checkmark\}),\\
+                 &(<a,c>,\{a,b,c\}),\\ &(<a,c,\checkmark>, \{a,b,c, \checkmark\})\}\\
+failures(P2) = \{&(<>,\{c\}),\\
+                 &(<>, \{b, \checkmark\}),\\ &(<a>, \{a,c\}),\\
+                 &(<a>, \{a,b,\checkmark\}),\\
+                 &(<a,b>, \{a,b,c\}), \\&(<a,c>, \{a,c,b,\checkmark\}),\\ &(<a,b,\checkmark>, \{a,b,c,\checkmark\})\}
+\end{split}
+\end{equation*}
+
+\subsection{Laws widerlegen}
+TODO
+\subsection{Laws anwenden}
+TODO
+
+\section{Refinement}
+\subsection{Nachweis von Automaten-Äquivalenz}
+\begin{lstlisting}
+channel a, b
+
+N0 = SKIP |~| (a -> N0 [] b -> N1 [] b -> N2)
+N1 = (a -> N3 [] b -> N2 ) |~| SKIP
+N2 = (a -> N0 [] b -> N3) |~| SKIP
+N3 = (a -> N3) [] b -> N3
+
+X0 = SKIP |~| (a -> X0 [] b -> X1)
+X1 = SKIP |~| (a -> X0 [] b -> X2)
+X2 = a -> STOP [] b -> X3
+X3 = SKIP |~| (a -> X0 [] b -> X2)
+
+assert N0 [T= X0
+assert N0 [F= X0
+assert X0 [T= N0
+assert X0 [F= N0
+\end{lstlisting}
+\begin{description}
+\item{\texttt{N0 [T= X0}} Assertion Failed. Gegenbeispiel: Trace <b,b,b,\checkmark> ist in X0, aber nicht in N0 vorhanden. Somit kann X0 kein refinement von N0 sein.\\
+\item{\texttt{N0 [F= X0}} Assertion Failed. Gegenbeispiel: Beim trace <b,b,a> ist die Refusal-Menge von X0 $\Sigma\frown\checkmark$, die Refusal-Menge von N0 aber $\Sigma \{a,b\}$.
+\item{\texttt{X0 [T= N0}} Assertion Failed. Gegenbeispiel: Der Trace <b,b,a,b> kommt in N0, aber nicht in X0 vor.
+\item{\texttt{X0 [F= N0}} Assertion Failed. Gegenbeispiel: Beim Trace <b,b> ist die Refusal-Menge von N0 $\Sigma$, von X0 aber $\Sigma\frown\checkmark \backslash \{a,b\}$.
+\end{description}
+\end{document}
+
