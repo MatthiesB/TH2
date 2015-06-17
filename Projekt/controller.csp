@@ -7,6 +7,7 @@ max = 2
 datatype SIGNAL = SMOKE | NO_SMOKE | POLL | RESET | DEFECT
 channel comm : {0..max}.SIGNAL
 channel alert
+channel env_smoke: SIGNAL
 
 CONTROLLER(x) = (x > max)& CONTROLLER(0)
        []
@@ -16,39 +17,51 @@ CONTROLLER(x) = (x > max)& CONTROLLER(0)
 ALERT(x) = alert -> comm!x.RESET -> CONTROLLER(x+1)
 	  
 SENSOR(x, STATE) = (comm.x?POLL -> if (STATE == NO_SMOKE) -- on poll: determine state, return it to controller and persist it via recursion 
-                                   then ((comm!x.NO_SMOKE -> SENSOR(x, NO_SMOKE)) |~| (comm!x.SMOKE -> SENSOR(x, SMOKE)) |~| (comm!x.DEFECT -> SENSOR(x, DEFECT)))
+                                   then (( (env_smoke.SMOKE -> comm!x.SMOKE -> SENSOR(x, SMOKE)) 
+								           [] 
+										   (env_smoke.NO_SMOKE -> comm!x.NO_SMOKE -> SENSOR(x, NO_SMOKE)) ) 
+								        |~| 
+										(comm!x.DEFECT -> SENSOR(x, DEFECT)))
                                    else comm!x.STATE -> SENSOR(x, STATE))
                    [] 
-			       (comm.x?RESET -> if (STATE == SMOKE) then SENSOR(x, NO_SMOKE) |~| SENSOR(x, SMOKE) -- internal choice for error on reset
+			       (comm.x?RESET -> if (STATE == SMOKE) then SENSOR(x, NO_SMOKE) -- |~| SENSOR(x, SMOKE) -- internal choice for error on reset
 				                    else SENSOR(x, STATE))
 	   
+	   
+ENV = (env_smoke.SMOKE -> ENV |~| env_smoke.NO_SMOKE -> ENV)
+	   
 --- concrete system --- 
-SYS = CONTROLLER(0) [|{| comm |}|] (||| i:{ 0..max } @ SENSOR(i, NO_SMOKE))
+SYS = CONTROLLER(0) [|{| comm |}|] ((||| i:{ 0..max } @ SENSOR(i, NO_SMOKE)) [|{| env_smoke |}|] ENV)
 
 -------------
 --- Tests --- 
 -------------
 
 --- channels for tests only --- 
-channel poll, no_smoke, error, smoke, defect
+channel poll, no_smoke, error, smoke, defect, reset
 
 SYS_HIDDEN = 
    SYS[[ comm.x.POLL <- poll, comm.x.NO_SMOKE <- no_smoke, comm.x.DEFECT <- defect | x <- {0..max} ]] 
 
-SYS_HIDDEN2 = 
-   SYS[[ comm.x.POLL <- poll, comm.x.SMOKE <- smoke | x <- {0..max} ]] 
+SYS_HIDDEN_ALL = 
+   SYS[[ comm.x.POLL <- poll, comm.x.NO_SMOKE <- no_smoke, comm.x.SMOKE <- smoke, comm.x.DEFECT <- defect, comm.x.RESET <- reset | x <- {0..max} ]] 
    
    
---- test specification ---
-SPEC = comm?x.SMOKE -> alert -> comm.x?RESET -> SPEC
+--- test specification (abstract system) ---
+SPEC = (env_smoke.SMOKE -> smoke -> alert -> reset -> SPEC)  
+       |~|
+	   (env_smoke.NO_SMOKE -> no_smoke -> SPEC)
+	   
+--- test if the specified behaviour is followed in concrete system ---
+assert SPEC [T= SYS_HIDDEN_ALL \{| poll, defect |}
 
---- tests if the specified behaviour is possible in concrete system ---
-assert SYS_HIDDEN\{| poll, no_smoke, defect |} [T= SPEC
+assert SPEC [F= SYS_HIDDEN_ALL \{| poll, defect |}
 
-assert SYS_HIDDEN\{| poll, no_smoke, defect |} [F= SPEC
+assert SPEC [FD= SYS_HIDDEN_ALL \{| poll, defect |}  --- this will and should fail: 
+                                                     --- if all sensors are defect, there is a endless loop not matched in the spec/asys
+assert SYS_HIDDEN_ALL \{| poll, defect |} [T= SPEC
 
-assert SYS_HIDDEN\{| poll, no_smoke, defect |} [FD= SPEC
-
+assert SYS_HIDDEN_ALL \{| poll, defect |} [F= SPEC  
 
 
 SPEC2 = comm?x.SMOKE -> alert -> comm?y.RESET -> if (y != x) then error -> STOP else SPEC2
@@ -58,11 +71,8 @@ assert not SYS_HIDDEN\{| poll, no_smoke |} [F= SPEC2
 
 
 
-SPEC3 = no_smoke -> SPEC3 -- useful?
+SPEC3 = (comm?x.SMOKE -> alert -> comm.x?RESET -> SPEC3) -- comes reset x after smoke x? 
 
---- tests if the specified behaviour is possible in concrete system ---
-assert SYS_HIDDEN\{| poll |} [T= SPEC3
+--- test: (only trace necessary to ensure this behaviour) ---
+assert SPEC3 [T= SYS_HIDDEN\{| poll, defect, no_smoke, env_smoke |} 
 
-assert SYS_HIDDEN\{| poll |} [F= SPEC3
-
-assert SYS_HIDDEN\{| poll |} [FD= SPEC3
